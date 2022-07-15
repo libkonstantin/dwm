@@ -249,6 +249,7 @@ static const char autostartblocksh[] = "autostart_blocking.sh";
 static const char autostartsh[] = "autostart.sh";
 static const char broken[] = "broken";
 static const char dwmdir[] = "dwm";
+static const char configdir[] = ".config";
 static const char localshare[] = ".local/share";
 static char stext[256];
 static int statusw;
@@ -1539,8 +1540,27 @@ runautostart(void)
 		}
 	} else {
 		/* space for path segments, separators and nul */
-		pathpfx = ecalloc(1, strlen(home) + strlen(localshare)
+		pathpfx = ecalloc(1, strlen(home) + strlen(configdir)
 		                     + strlen(dwmdir) + 3);
+
+		if (sprintf(pathpfx, "%s/%s/%s", home, configdir, dwmdir) < 0) {
+			free(pathpfx);
+			return;
+		}
+	}
+
+	/* check if the autostart script directory exists */
+	if (! (stat(pathpfx, &sb) == 0 && S_ISDIR(sb.st_mode))) {
+		/* the XDG conformant path does not exist or is no directory
+		 * so we try ~/.local/share/dwm instead
+		 */
+		char *pathpfx_new = realloc(pathpfx, strlen(home) + strlen(localshare)
+		                                     + strlen(dwmdir) + 3);
+		if(pathpfx_new == NULL) {
+			free(pathpfx);
+			return;
+		}
+		pathpfx = pathpfx_new;
 
 		if (sprintf(pathpfx, "%s/%s/%s", home, localshare, dwmdir) < 0) {
 			free(pathpfx);
