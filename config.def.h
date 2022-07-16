@@ -64,6 +64,9 @@ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont,
 static const char *roficmd[] = { "rofi", "-modi", "window,ssh,run,drun", "-show", "run", "-sidebar-mode", "-terminal", "st", "-theme", "dracula", NULL };
 static const char *termcmd[]  = { "st", NULL };
 
+static const char *rulayoutcmd[] = { "xkb-switch", "-s", "ru", NULL };
+static const char *uslayoutcmd[] = { "xkb-switch", "-s", "us", NULL };
+
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_d,      spawn,          {.v = roficmd } },
@@ -94,6 +97,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_minus,  setgaps,        {.i = -1 } },
 	{ MODKEY,                       XK_equal,  setgaps,        {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_equal,  setgaps,        {.i = 0  } },
+	{ MODKEY,                       XK_r,      spawn,          {.v = rulayoutcmd } },
+	{ MODKEY,                       XK_u,      spawn,          {.v = uslayoutcmd } },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
