@@ -100,12 +100,19 @@ struct Client {
 	Window win;
 };
 
+#define KEYCHORD_LEN 2
+
 typedef struct {
 	unsigned int mod;
 	KeySym keysym;
+} Key;
+
+typedef struct {
+	unsigned int n;
+	const Key keys[KEYCHORD_LEN];
 	void (*func)(const Arg *);
 	const Arg arg;
-} Key;
+} Keychord;
 
 typedef struct {
 	const char *symbol;
@@ -285,6 +292,9 @@ static Display *dpy;
 static Drw *drw;
 static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
+
+Key current_keys[KEYCHORD_LEN];
+unsigned int current_key = 0;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -1051,16 +1061,17 @@ grabkeys(void)
 {
 	updatenumlockmask();
 	{
-		unsigned int i, j;
+		unsigned int i, j, k;
 		unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
 		KeyCode code;
 
 		XUngrabKey(dpy, AnyKey, AnyModifier, root);
-		for (i = 0; i < LENGTH(keys); i++)
-			if ((code = XKeysymToKeycode(dpy, keys[i].keysym)))
-				for (j = 0; j < LENGTH(modifiers); j++)
-					XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
-						True, GrabModeAsync, GrabModeAsync);
+		for (i = 0; i < LENGTH(keychords); i++)
+			for (j = 0; j < keychords[i].n; j++)
+				if ((code = XKeysymToKeycode(dpy, keychords[i].keys[j].keysym)))
+					for (k = 0; k < LENGTH(modifiers); k++)
+						XGrabKey(dpy, code, keychords[i].keys[j].mod | modifiers[k], root,
+							True, GrabModeAsync, GrabModeAsync);
 	}
 }
 
@@ -1086,17 +1097,35 @@ isuniquegeom(XineramaScreenInfo *unique, size_t n, XineramaScreenInfo *info)
 void
 keypress(XEvent *e)
 {
-	unsigned int i;
 	KeySym keysym;
 	XKeyEvent *ev;
 
 	ev = &e->xkey;
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
-	for (i = 0; i < LENGTH(keys); i++)
-		if (keysym == keys[i].keysym
-		&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
-		&& keys[i].func)
-			keys[i].func(&(keys[i].arg));
+	current_keys[current_key].keysym = keysym;
+	current_keys[current_key].mod = CLEANMASK(ev->state);
+	current_key++;
+
+	int executed = False;
+	int was_ok = False;
+	for (int i = 0; i < LENGTH(keychords); i++) {
+		int ok = True;
+		for (int j = 0; ok && j < keychords[i].n && j < current_key; j++) {
+			ok = CLEANMASK(current_keys[j].mod) == CLEANMASK(keychords[i].keys[j].mod)
+				&& current_keys[j].keysym == keychords[i].keys[j].keysym;
+		}
+		if (ok) {
+			was_ok = True;
+			if (keychords[i].n == current_key && keychords[i].func) {
+				keychords[i].func(&(keychords[i].arg));
+				executed = True;
+			}
+		}
+	}
+
+	if (!was_ok || executed || current_key == KEYCHORD_LEN) {
+		current_key = 0;
+	}
 }
 
 void

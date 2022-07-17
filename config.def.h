@@ -47,11 +47,22 @@ static const Layout layouts[] = {
 
 /* key definitions */
 #define MODKEY Mod4Mask
-#define TAGKEYS(KEY,TAG) \
-	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
-	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
-	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
-	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
+
+#define TAGKEYS1(KEY,TAG)                                                                   \
+	{1, {{MODKEY,                       KEY}},          view,           {.ui = 1 << TAG} }, \
+	{1, {{MODKEY|ControlMask,           KEY}},          toggleview,     {.ui = 1 << TAG} }, \
+	{1, {{MODKEY|ShiftMask,             KEY}},          tag,            {.ui = 1 << TAG} }, \
+	{1, {{MODKEY|ControlMask|ShiftMask, KEY}},          toggletag,      {.ui = 1 << TAG} },
+
+#define TAGKEYS2(KEY1, KEY2,TAG)                                                            \
+	{2, {{MODKEY,                       KEY1},                                              \
+	     {MODKEY,                       KEY2}},         view,           {.ui = 1 << TAG} }, \
+	{2, {{MODKEY|ControlMask,           KEY1},                                              \
+	     {MODKEY|ControlMask,           KEY2}},         toggleview,     {.ui = 1 << TAG} }, \
+	{2, {{MODKEY|ShiftMask,             KEY1},                                              \
+	     {MODKEY|ShiftMask,             KEY2}},         tag,            {.ui = 1 << TAG} }, \
+	{2, {{MODKEY|ControlMask|ShiftMask, KEY1},                                              \
+	     {MODKEY|ControlMask|ShiftMask, KEY2}},         toggletag,      {.ui = 1 << TAG} },
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
@@ -67,48 +78,50 @@ static const char *termcmd[]  = { "st", NULL };
 static const char *rulayoutcmd[] = { "xkb-switch", "-s", "ru", NULL };
 static const char *uslayoutcmd[] = { "xkb-switch", "-s", "us", NULL };
 
-static Key keys[] = {
-	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_d,      spawn,          {.v = roficmd } },
-	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_b,      togglebar,      {0} },
-	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
-	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_j,      rotatestack,    {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_k,      rotatestack,    {.i = -1 } },
-	{ MODKEY,                       XK_h,      focusmon,       {.i = -1 } },
-	{ MODKEY,                       XK_l,      focusmon,       {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_h,      tagmon,         {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_l,      tagmon,         {.i = +1 } },
-	{ MODKEY|ControlMask,           XK_j,      incnmaster,     {.i = +1 } },
-	{ MODKEY|ControlMask,           XK_k,      incnmaster,     {.i = -1 } },
-	{ MODKEY|ControlMask,           XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY|ControlMask,           XK_l,      setmfact,       {.f = +0.05} },
-	{ MODKEY|ShiftMask,             XK_Return, zoom,           {0} },
-	{ MODKEY,                       XK_Tab,    view,           {0} },
-	{ MODKEY|ShiftMask,             XK_q,      killclient,     {0} },
-	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
-	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
-	{ MODKEY,                       XK_space,  setlayout,      {0} },
-	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
-	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
-	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
-	{ MODKEY,                       XK_minus,  setgaps,        {.i = -1 } },
-	{ MODKEY,                       XK_equal,  setgaps,        {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_equal,  setgaps,        {.i = 0  } },
-	{ MODKEY,                       XK_r,      spawn,          {.v = rulayoutcmd } },
-	{ MODKEY,                       XK_u,      spawn,          {.v = uslayoutcmd } },
-	TAGKEYS(                        XK_1,                      0)
-	TAGKEYS(                        XK_2,                      1)
-	TAGKEYS(                        XK_3,                      2)
-	TAGKEYS(                        XK_4,                      3)
-	TAGKEYS(                        XK_5,                      4)
-	TAGKEYS(                        XK_6,                      5)
-	TAGKEYS(                        XK_7,                      6)
-	TAGKEYS(                        XK_8,                      7)
-	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ShiftMask,             XK_e,      quit,           {0} },
+static Keychord keychords[] = {
+	/*   modifier                       key             function        argument */
+	{1, {{MODKEY,                       XK_d        }}, spawn,          {.v = roficmd } },
+	{1, {{MODKEY,                       XK_Return   }}, spawn,          {.v = termcmd } },
+	{2, {{MODKEY,                       XK_a        },
+	     {MODKEY,                       XK_t        }}, spawn,          {.v = termcmd } },
+	{1, {{MODKEY,                       XK_b        }}, togglebar,      {0} },
+	{1, {{MODKEY,                       XK_j,       }}, focusstack,     {.i = +1 } },
+	{1, {{MODKEY,                       XK_k,       }}, focusstack,     {.i = -1 } },
+	{1, {{MODKEY|ShiftMask,             XK_j,       }}, rotatestack,    {.i = +1 } },
+	{1, {{MODKEY|ShiftMask,             XK_k,       }}, rotatestack,    {.i = -1 } },
+	{1, {{MODKEY,                       XK_h,       }}, focusmon,       {.i = -1 } },
+	{1, {{MODKEY,                       XK_l,       }}, focusmon,       {.i = +1 } },
+	{1, {{MODKEY|ShiftMask,             XK_h,       }}, tagmon,         {.i = -1 } },
+	{1, {{MODKEY|ShiftMask,             XK_l,       }}, tagmon,         {.i = +1 } },
+	{1, {{MODKEY|ControlMask,           XK_j,       }}, incnmaster,     {.i = +1 } },
+	{1, {{MODKEY|ControlMask,           XK_k,       }}, incnmaster,     {.i = -1 } },
+	{1, {{MODKEY|ControlMask,           XK_h,       }}, setmfact,       {.f = -0.05} },
+	{1, {{MODKEY|ControlMask,           XK_l,       }}, setmfact,       {.f = +0.05} },
+	{1, {{MODKEY|ShiftMask,             XK_Return,  }}, zoom,           {0} },
+	{1, {{MODKEY,                       XK_Tab,     }}, view,           {0} },
+	{1, {{MODKEY|ShiftMask,             XK_q,       }}, killclient,     {0} },
+	{1, {{MODKEY,                       XK_t,       }}, setlayout,      {.v = &layouts[0]} },
+	{1, {{MODKEY,                       XK_f,       }}, setlayout,      {.v = &layouts[1]} },
+	{1, {{MODKEY,                       XK_m,       }}, setlayout,      {.v = &layouts[2]} },
+	{1, {{MODKEY,                       XK_space,   }}, setlayout,      {0} },
+	{1, {{MODKEY|ShiftMask,             XK_space,   }}, togglefloating, {0} },
+	{1, {{MODKEY,                       XK_0,       }}, view,           {.ui = ~0 } },
+	{1, {{MODKEY|ShiftMask,             XK_0,       }}, tag,            {.ui = ~0 } },
+	{1, {{MODKEY,                       XK_minus,   }}, setgaps,        {.i = -1 } },
+	{1, {{MODKEY,                       XK_equal,   }}, setgaps,        {.i = +1 } },
+	{1, {{MODKEY|ShiftMask,             XK_equal,   }}, setgaps,        {.i = 0  } },
+	{1, {{MODKEY,                       XK_r,       }}, spawn,          {.v = rulayoutcmd } },
+	{1, {{MODKEY,                       XK_u,       }}, spawn,          {.v = uslayoutcmd } },
+	TAGKEYS1(                           XK_1,                           0)
+	TAGKEYS1(                           XK_2,                           1)
+	TAGKEYS1(                           XK_3,                           2)
+	TAGKEYS1(                           XK_4,                           3)
+	TAGKEYS1(                           XK_5,                           4)
+	TAGKEYS1(                           XK_6,                           5)
+	TAGKEYS1(                           XK_7,                           6)
+	TAGKEYS1(                           XK_8,                           7)
+	TAGKEYS1(                           XK_9,                           8)
+	{1, {{MODKEY|ShiftMask,             XK_e,       }}, quit,           {0} },
 };
 
 /* button definitions */
