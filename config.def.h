@@ -55,7 +55,10 @@ static char *colors[][3] = {
 };
 
 /* tagging */
-static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+static const char *tags[] = { "~", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+                              "b", "d", "e", "f", "g", "h", "i", "j",
+                              "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
+                              "v", "w", "y"};
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -116,8 +119,6 @@ static Keychord keychords[] = {
 	/*   modifier                       key             function        argument */
 	{1, {{MODKEY,                       XK_d        }}, spawn,          {.v = roficmd } },
 	{1, {{MODKEY,                       XK_Return   }}, spawn,          {.v = termcmd } },
-	{2, {{MODKEY,                       XK_a        },
-	     {MODKEY,                       XK_t        }}, spawn,          {.v = termcmd } },
 	{1, {{MODKEY,                       XK_b        }}, togglebar,      {0} },
 	{1, {{MODKEY,                       XK_j,       }}, focusstack,     {.i = +1 } },
 	{1, {{MODKEY,                       XK_k,       }}, focusstack,     {.i = -1 } },
@@ -147,15 +148,37 @@ static Keychord keychords[] = {
 	{1, {{MODKEY,                       XK_r,       }}, spawn,          {.v = rulayoutcmd } },
 	{1, {{MODKEY,                       XK_u,       }}, spawn,          {.v = uslayoutcmd } },
 	{1, {{MODKEY,                       XK_F5,      }}, xrdb,           {.v = NULL } },
-	TAGKEYS1(                           XK_1,                           0)
-	TAGKEYS1(                           XK_2,                           1)
-	TAGKEYS1(                           XK_3,                           2)
-	TAGKEYS1(                           XK_4,                           3)
-	TAGKEYS1(                           XK_5,                           4)
-	TAGKEYS1(                           XK_6,                           5)
-	TAGKEYS1(                           XK_7,                           6)
-	TAGKEYS1(                           XK_8,                           7)
-	TAGKEYS1(                           XK_9,                           8)
+	TAGKEYS1(                           XK_grave,                       0)
+	TAGKEYS1(                           XK_1,                           1)
+	TAGKEYS1(                           XK_2,                           2)
+	TAGKEYS1(                           XK_3,                           3)
+	TAGKEYS1(                           XK_4,                           4)
+	TAGKEYS1(                           XK_5,                           5)
+	TAGKEYS1(                           XK_6,                           6)
+	TAGKEYS1(                           XK_7,                           7)
+	TAGKEYS1(                           XK_8,                           8)
+	TAGKEYS1(                           XK_9,                           9)
+	TAGKEYS2(                           XK_w, XK_b,                     10)
+	TAGKEYS2(                           XK_w, XK_d,                     11)
+	TAGKEYS2(                           XK_w, XK_e,                     12)
+	TAGKEYS2(                           XK_w, XK_f,                     13)
+	TAGKEYS2(                           XK_w, XK_g,                     14)
+	TAGKEYS2(                           XK_o, XK_h,                     15)
+	TAGKEYS2(                           XK_o, XK_i,                     16)
+	TAGKEYS2(                           XK_o, XK_j,                     17)
+	TAGKEYS2(                           XK_o, XK_k,                     18)
+	TAGKEYS2(                           XK_o, XK_l,                     19)
+	TAGKEYS2(                           XK_o, XK_m,                     20)
+	TAGKEYS2(                           XK_o, XK_n,                     21)
+	TAGKEYS2(                           XK_o, XK_o,                     22)
+	TAGKEYS2(                           XK_o, XK_p,                     23)
+	TAGKEYS2(                           XK_w, XK_r,                     24)
+	TAGKEYS2(                           XK_w, XK_s,                     25)
+	TAGKEYS2(                           XK_w, XK_t,                     26)
+	TAGKEYS2(                           XK_o, XK_u,                     27)
+	TAGKEYS2(                           XK_w, XK_v,                     28)
+	TAGKEYS2(                           XK_w, XK_w,                     29)
+	TAGKEYS2(                           XK_o, XK_y,                     31)
 	{1, {{MODKEY|ShiftMask,             XK_e,       }}, quit,           {0} },
 };
 
